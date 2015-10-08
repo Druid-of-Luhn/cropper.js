@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Image Uploader</title>
+    <style>
+html,
+input {
+    box-sizing: border-box;
+    font-family: Helvetica, sans-serif;
+}
+
+* {
+    box-sizing: inherit;
+}
+
+.hidden {
+    display: none;
+}
+
+.img-upload-label {
+    width: 20em;
+    height: 20em;
+    display: block;
+    position: relative;
+    border: 4px dashed teal;
+    text-align: center;
+    color: teal;
+    cursor: pointer;
+}
+
+.img-upload-label > h1 {
+    line-height: 8em;
+    margin-bottom: -3em;
+}
+
+.img-upload-label:hover,
+.img-upload-label.hovered {
+    background-color: #eee;
+}
+
+.img-upload {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: red;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.img-export {
+    display: block;
+}
+    </style>
+</head>
+<body>
+    <label class="img-upload-label">
+        <h1>Upload Image</h1>
+        Or drag and drop
+        <input type="file" class="js-fileinput img-upload" accept="image/jpeg,image/png,image/gif">
+    </label>
+    <button class="js-export">Export</button>
+    <canvas class="js-editorcanvas hidden"></canvas>
+    <canvas class="js-previewcanvas"></canvas>
+
+    <script src="cropper.js"></script>
+    <script>
+function exceptionHandler(message) {
+  alert(message);
+}
+
+(function main() {
+  // Auto-resize the cropped image
+  var dimensions = { width: 128, height: 128 };
+
+  var uploader = new Uploader({
+    exceptions: exceptionHandler,
+    input: ".js-fileinput",
+    types: ["gif", "jpg", "jpeg", "png"]
+  });
+
+  var editor = new Cropper({
+    exceptions: exceptionHandler,
+    size: dimensions,
+    canvas: ".js-editorcanvas",
+    preview: ".js-previewcanvas"
+  });
+
+  // Make sure both were initialised correctly
+  if (uploader !== null && editor != null) {
+    // Start the uploader, which will launch the editor
+    uploader.listen(editor.setImageSource.bind(editor));
+  }
+  // Allow the result to be exported as an actual image
+  var img = document.createElement("img");
+  document.body.appendChild(img);
+  document.querySelector(".js-export")
+    .addEventListener("click", function (e) {
+      editor.export(img);
+    });
+})();
+    </script>
+</body>
+</html>
