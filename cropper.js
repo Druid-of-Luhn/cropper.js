@@ -1,7 +1,8 @@
 /**
  * @file Allows uploading, cropping (with automatic resizing) and exporting
  * of images.
- * @author Druid of Lûhn
+ * @author Billy Brown
+ * @license MIT
  * @version 1.0.0
  */
 
