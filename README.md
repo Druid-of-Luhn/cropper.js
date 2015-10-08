@@ -9,7 +9,7 @@ Just submit a pull request and I will take a look at your contribution!
 
 ## Tutorial
 
-The [documentation](http://billy-brown.net/cropper.js/docs) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need.
+The [documentation](http://billy-brown.net/cropper.js/docs) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need, and an example webpage can be seen here: [http://billy-brown.net/cropper.js/](http://billy-brown.net/cropper.js/)
 
 Below is a minimal example of using cropper.js:
 
