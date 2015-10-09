@@ -4,12 +4,16 @@ cropper.js is an image uploading and cropping tool that can easily be added to y
 The current version supports cropping and automatic resizing to a given value, as well as exporting the result.
 The aspect ratio of the crop is fixed and files with a side longer than 600px are resized on upload.
 
+![Example of cropper.js being used](http://i.imgur.com/mzbeAgY.png)
+
 This project is open source and still under development, so any additions or changes are welcome.
 Just submit a pull request and I will take a look at your contribution!
 
 ## Tutorial
 
 The [documentation](http://billy-brown.net/cropper.js/docs) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need, and an example webpage can be seen here: [http://billy-brown.net/cropper.js/](http://billy-brown.net/cropper.js/)
+
+You can experiment with the code over on Codepen here: [http://codepen.io/_Billy_Brown/pen/zvzWym?editors=101](http://codepen.io/_Billy_Brown/pen/zvzWym?editors=101)
 
 Below is a minimal example of using cropper.js:
 
