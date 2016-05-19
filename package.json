@@ -1,0 +1,29 @@
+{
+  "name": "cropper.js",
+  "version": "1.0.0",
+  "description": "A vanilla JavaScript library for uploading and cropping images.",
+  "main": "cropper.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Druid-of-Luhn/cropper.js.git"
+  },
+  "keywords": [
+    "image",
+    "crop",
+    "upload",
+    "resize",
+    "picture"
+  ],
+  "author": "Billy Brown",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Druid-of-Luhn/cropper.js/issues"
+  },
+  "homepage": "https://github.com/Druid-of-Luhn/cropper.js#readme",
+}

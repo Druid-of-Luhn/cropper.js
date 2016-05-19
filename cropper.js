@@ -1,3 +1,46 @@
+class Uploader {
+  constructor(options) {
+    if (!options.input) {
+      throw '[Uploader] Missing input file element.';
+    }
+    this.fileInput = options.input;
+    this.types = options.types || [ 'gif', 'jpg', 'jpeg', 'png' ];
+    this.reader = new FileReader();
+  }
+
+  listen() {
+    return new Promise((resolve, reject) => {
+      this.fileInput.onchange = (e) => {
+        // Do not submit the form
+        e.preventDefault();
+        // Make sure one file was selected
+        if (!this.fileInput.files || this.fileInput.files.length !== 1) {
+          reject('[Uploader:listen] Select only one file.');
+        } else {
+          this.fileReaderSetup(this.fileInput.files[0], resolve, reject);
+        }
+      };
+    });
+  }
+
+  fileReaderSetup(file, resolve) {
+    if (this.validFileType(file.type)) {
+      // Read the image as base64 data
+      this.reader.readAsDataURL(file);
+      // Resolve the promise with the image data
+      this.reader.onload = (e) => resolve(e.target.result);
+    } else {
+      reject('[Uploader:fileReaderSetup] Invalid file type.');
+    }
+  }
+
+  validFileType(filename) {
+    // Get the second part of the MIME type
+    let extension = filename.split('/').pop().toLowerCase();
+    // See if it is in the array of allowed types
+    return this.allowedTypes.includes(extension);
+  }
+}
 /**
  * @file Allows uploading, cropping (with automatic resizing) and exporting
  * of images.
@@ -25,61 +68,61 @@
  * @class
  * @param {object} options - the parameters to be passed for instantiation
  */
-function Uploader(options) {
-  /** @private */
-  this.exceptionHandler = options.exceptions || console.log.bind(console);
-  this.fileInput = document.querySelector(options.input);
-  if (this.fileInput === null) {
-    this.exceptionHandler("Could not find file input element: " + options.input);
-    return null;
-  }
-  this.allowedTypes = options.types || ["gif", "jpg", "jpeg", "png"];
-  this.reader = new FileReader();
-}
+// function Uploader(options) {
+//   /** @private */
+//   this.exceptionHandler = options.exceptions || console.log.bind(console);
+//   this.fileInput = document.querySelector(options.input);
+//   if (this.fileInput === null) {
+//     this.exceptionHandler("Could not find file input element: " + options.input);
+//     return null;
+//   }
+//   this.allowedTypes = options.types || ["gif", "jpg", "jpeg", "png"];
+//   this.reader = new FileReader();
+// }
 
-/**
- * Calls a callback function when the file has been uploaded, passing it the
- * image data in base64 format.
- * @param {function} callback - the function to be called with the data when ready
- */
-Uploader.prototype.listen = function (callback) {
-  if (!this.fileInput) {
-    return;
-  }
-  this.fileInput.addEventListener("change", function(e) {
-    // Do not submit the form
-    e.preventDefault();
-    // Make sure one file was selected
-    if (!this.fileInput.files || this.fileInput.files.length !== 1) {
-      this.exceptionHandler("Please select one file");
-    } else {
-      this.fileReaderSetup(this.fileInput.files[0], callback);
-    }
-  }.bind(this));
-};
+// /**
+//  * Calls a callback function when the file has been uploaded, passing it the
+//  * image data in base64 format.
+//  * @param {function} callback - the function to be called with the data when ready
+//  */
+// Uploader.prototype.listen = function (callback) {
+//   if (!this.fileInput) {
+//     return;
+//   }
+//   this.fileInput.addEventListener("change", function(e) {
+//     // Do not submit the form
+//     e.preventDefault();
+//     // Make sure one file was selected
+//     if (!this.fileInput.files || this.fileInput.files.length !== 1) {
+//       this.exceptionHandler("Please select one file");
+//     } else {
+//       this.fileReaderSetup(this.fileInput.files[0], callback);
+//     }
+//   }.bind(this));
+// };
 
-/** @private */
-Uploader.prototype.fileReaderSetup = function(file, callback) {
-  // Make sure the file is an image
-  if (this.validFileType(file.type)) {
-    // Read the image as base64 data
-    this.reader.readAsDataURL(file);
-    this.reader.addEventListener("load", function(e) {
-      // Call the callback with the image's base64 data when it's available
-      callback(e.target.result);
-    });
-  } else {
-    this.exceptionHandler("Invalid file type, please use one of: " + this.allowedTypes);
-  }
-};
+// /** @private */
+// Uploader.prototype.fileReaderSetup = function(file, callback) {
+//   // Make sure the file is an image
+//   if (this.validFileType(file.type)) {
+//     // Read the image as base64 data
+//     this.reader.readAsDataURL(file);
+//     this.reader.addEventListener("load", function(e) {
+//       // Call the callback with the image's base64 data when it's available
+//       callback(e.target.result);
+//     });
+//   } else {
+//     this.exceptionHandler("Invalid file type, please use one of: " + this.allowedTypes);
+//   }
+// };
 
-/** @private */
-Uploader.prototype.validFileType = function(filename) {
-  // Get the second part of the MIME type
-  var extension = filename.split("/").pop().toLowerCase();
-  // See if it is in the array of allowed types
-  return this.allowedTypes.indexOf(extension) !== -1;
-};
+// /** @private */
+// Uploader.prototype.validFileType = function(filename) {
+//   // Get the second part of the MIME type
+//   var extension = filename.split("/").pop().toLowerCase();
+//   // See if it is in the array of allowed types
+//   return this.allowedTypes.indexOf(extension) !== -1;
+// };
 
 /**
  * <p>Creates a Cropper instance with parameters passed as an object.</p>
