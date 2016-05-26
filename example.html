@@ -82,10 +82,9 @@ try {
     });
 
     var editor = new Cropper({
-        exceptions: exceptionHandler,
         size: dimensions,
-        canvas: ".js-editorcanvas",
-        preview: ".js-previewcanvas"
+        canvas: document.querySelector('.js-editorcanvas'),
+        preview: document.querySelector('.js-previewcanvas')
     });
 
     // Make sure both were initialised correctly
@@ -93,19 +92,15 @@ try {
         // Start the uploader, which will launch the editor
         uploader.listen()
             .then(editor.setImageSource.bind(editor))
-            .catch(function (error) {
-                throw error;
-            });
+            .catch((error) => { throw error; });
     }
     // Allow the result to be exported as an actual image
-    var img = document.createElement("img");
+    var img = document.createElement('img');
     document.body.appendChild(img);
-    document.querySelector(".js-export")
-        .addEventListener("click", function (e) {
-            editor.export(img);
-        });
-} catch (e) {
-    exceptionHandler(e.message);
+    document.querySelector('.js-export').onclick = (e) => editor.export(img);
+
+} catch (error) {
+    exceptionHandler(error.message);
 }
     </script>
 </body>
