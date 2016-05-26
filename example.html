@@ -72,36 +72,41 @@ function exceptionHandler(message) {
   alert(message);
 }
 
-(function main() {
-  // Auto-resize the cropped image
-  var dimensions = { width: 128, height: 128 };
+// Auto-resize the cropped image
+var dimensions = { width: 128, height: 128 };
 
-  var uploader = new Uploader({
-    exceptions: exceptionHandler,
-    input: ".js-fileinput",
-    types: ["gif", "jpg", "jpeg", "png"]
-  });
-
-  var editor = new Cropper({
-    exceptions: exceptionHandler,
-    size: dimensions,
-    canvas: ".js-editorcanvas",
-    preview: ".js-previewcanvas"
-  });
-
-  // Make sure both were initialised correctly
-  if (uploader !== null && editor != null) {
-    // Start the uploader, which will launch the editor
-    uploader.listen(editor.setImageSource.bind(editor));
-  }
-  // Allow the result to be exported as an actual image
-  var img = document.createElement("img");
-  document.body.appendChild(img);
-  document.querySelector(".js-export")
-    .addEventListener("click", function (e) {
-      editor.export(img);
+try {
+    var uploader = new Uploader({
+        input: document.querySelector('.js-fileinput'),
+        types: [ 'gif', 'jpg', 'jpeg', 'png' ]
     });
-})();
+
+    var editor = new Cropper({
+        exceptions: exceptionHandler,
+        size: dimensions,
+        canvas: ".js-editorcanvas",
+        preview: ".js-previewcanvas"
+    });
+
+    // Make sure both were initialised correctly
+    if (uploader && editor) {
+        // Start the uploader, which will launch the editor
+        uploader.listen()
+            .then(editor.setImageSource.bind(editor))
+            .catch(function (error) {
+                throw error;
+            });
+    }
+    // Allow the result to be exported as an actual image
+    var img = document.createElement("img");
+    document.body.appendChild(img);
+    document.querySelector(".js-export")
+        .addEventListener("click", function (e) {
+            editor.export(img);
+        });
+} catch (e) {
+    exceptionHandler(e.message);
+}
     </script>
 </body>
 </html>
