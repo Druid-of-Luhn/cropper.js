@@ -19,38 +19,6 @@ input {
     display: none;
 }
 
-.img-upload-label {
-    width: 20em;
-    height: 20em;
-    display: block;
-    position: relative;
-    border: 4px dashed teal;
-    text-align: center;
-    color: teal;
-    cursor: pointer;
-}
-
-.img-upload-label > h1 {
-    line-height: 8em;
-    margin-bottom: -3em;
-}
-
-.img-upload-label:hover,
-.img-upload-label.hovered {
-    background-color: #eee;
-}
-
-.img-upload {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: red;
-    cursor: pointer;
-    opacity: 0;
-}
-
 .img-export {
     display: block;
 }
@@ -58,11 +26,10 @@ input {
 </head>
 <body>
     <label class="img-upload-label">
-        <h1>Upload Image</h1>
-        Or drag and drop
+        Upload Image:
         <input type="file" class="js-fileinput img-upload" accept="image/jpeg,image/png,image/gif">
     </label>
-    <button class="js-export">Export</button>
+    <button class="js-export img-export">Export</button>
     <canvas class="js-editorcanvas hidden"></canvas>
     <canvas class="js-previewcanvas"></canvas>
 
