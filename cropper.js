@@ -81,6 +81,7 @@ class Uploader {
  * @example
  * var editor = new Cropper({
  *  size: { width: 128, height: 128 },
+ *  limit: 600,
  *  canvas: document.querySelector('.js-editorcanvas'),
  *  preview: document.querySelector('.js-previewcanvas')
  * });
@@ -111,12 +112,16 @@ class Cropper {
       br: { x: options.size.width, y: options.size.height }
     };
     this.lastEvent = null;
+    // Images larger than options.limit are resized
+    this.limit = options.limit || 600; // default to 600px
   }
 
   setImageSource(source) {
     this.image = new Image();
     this.image.src = source;
     this.image.onload = this.readyEditor.bind(this);
+    // Perform an initial render
+    this.render();
   }
 
   export(img) {
@@ -206,14 +211,13 @@ class Cropper {
 
   /** @private */
   displayImage() {
-    var maxSide = 600;
     // Resize the original to the maximum allowed size
-    if (this.image.width > maxSide) {
-      this.image.height *= maxSide / this.image.width;
-      this.image.width = maxSide;
-    } else if (this.image.height > maxSide) {
-      this.image.width *= maxSide / this.image.height;
-      this.image.height = maxSide;
+    if (this.image.width > this.limit) {
+      this.image.height *= this.limit / this.image.width;
+      this.image.width = this.limit;
+    } else if (this.image.height > this.limit) {
+      this.image.width *= this.limit / this.image.height;
+      this.image.height = this.limit;
     }
     // Fit the image to the canvas (fixed width canvas, dynamic height)
     this.imageCanvas.width = this.image.width;
