@@ -13,7 +13,8 @@ The library is written in ECMAScript 6, so make sure that target browsers suppor
 
 ## Documentation
 
-The [documentation](http://billy-brown.net/cropper.js/docs) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need, and an example webpage can be seen here: [http://billy-brown.net/cropper.js/](http://billy-brown.net/cropper.js/)
+The [documentation](http://billy-brown.net/cropper.js/docs) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need.
+An example webpage can be seen here: [http://billy-brown.net/cropper.js/](http://billy-brown.net/cropper.js/)
 
 ## Examples
 
