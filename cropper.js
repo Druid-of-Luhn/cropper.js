@@ -43,26 +43,24 @@ class Uploader {
       this.fileInput.onchange = (e) => {
         // Do not submit the form
         e.preventDefault();
+
         // Make sure one file was selected
         if (!this.fileInput.files || this.fileInput.files.length !== 1) {
           reject('[Uploader:listen] Select only one file.');
+        }
+
+        let file = this.fileInput.files[0];
+        // Make sure the file is of the correct type
+        if (!this.validFileType(file.type)) {
+          reject(`[Uploader:listen] Invalid file type: ${file.type}`);
         } else {
-          this.fileReaderSetup(this.fileInput.files[0], resolve, reject);
+          // Read the image as base64 data
+          this.reader.readAsDataURL(file);
+          // When loaded, return the file data
+          this.reader.onload = (e) => resolve(e.target.result);
         }
       };
     });
-  }
-
-  /** @private */
-  fileReaderSetup(file, resolve) {
-    if (this.validFileType(file.type)) {
-      // Read the image as base64 data
-      this.reader.readAsDataURL(file);
-      // Resolve the promise with the image data
-      this.reader.onload = (e) => resolve(e.target.result);
-    } else {
-      reject('[Uploader:fileReaderSetup] Invalid file type.');
-    }
   }
 
   /** @private */
