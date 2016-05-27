@@ -6,12 +6,14 @@
  * @version 1.0.0
  */
 
+/** Class used for uploading images. */
+class Uploader {
 /**
  * <p>Creates an Uploader instance with parameters passed as an object.</p>
  * <p>Available parameters are:</p>
  * <ul>
  *  <li>exceptions {function}: the exceptions handler to use, function that takes a string.</li>
- *  <li>input {string} (required): the classname (prefixed with ".") for the input element. Instantiation fails if not provided.</li>
+ *  <li>input {HTMLElement} (required): the file input element. Instantiation fails if not provided.</li>
  *  <li>types {array}: the file types accepted by the uploader.</li>
  * </ul>
  *
@@ -20,11 +22,9 @@
  *  input: document.querySelector('.js-fileinput'),
  *  types: [ 'gif', 'jpg', 'jpeg', 'png' ]
  * });
- *
- * @class
+ * *
  * @param {object} options - the parameters to be passed for instantiation
  */
-class Uploader {
   constructor(options) {
     if (!options.input) {
       throw '[Uploader] Missing input file element.';
@@ -68,28 +68,28 @@ class Uploader {
   }
 }
 
-/**
- * <p>Creates a Cropper instance with parameters passed as an object.</p>
- * <p>Available parameters are:</p>
- * <ul>
- *  <li>exceptions {function}: the exceptions handler to use, function that takes a string.</li>
- *  <li>size {object} (required): the dimensions of the cropped, resized image. Must have 'width' and 'height' fields. </li>
- *  <li>canvas {string} (required): the classname (prefixed with ".") for the cropping canvas element. Instantiation fails if not provided.</li>
- *  <li>preview {string} (required): the classname (prefixed with ".") for the preview canvas element. Instantiation fails if not provided.</li>
- * </ul>
- *
- * @example
- * var editor = new Cropper({
- *  size: { width: 128, height: 128 },
- *  limit: 600,
- *  canvas: document.querySelector('.js-editorcanvas'),
- *  preview: document.querySelector('.js-previewcanvas')
- * });
- *
- * @class
- * @param {object} options - the parameters to be passed for instantiation
- */
+/** Class for cropping an image. */
 class Cropper {
+  /**
+   * <p>Creates a Cropper instance with parameters passed as an object.</p>
+   * <p>Available parameters are:</p>
+   * <ul>
+   *  <li>size {object} (required): the dimensions of the cropped, resized image. Must have 'width' and 'height' fields. </li>
+   *  <li>limit {integer}: the longest side that the cropping area will be limited to, resizing any larger images.</li>
+   *  <li>canvas {HTMLElement} (required): the cropping canvas element. Instantiation fails if not provided.</li>
+   *  <li>preview {HTMLElement} (required): the preview canvas element. Instantiation fails if not provided.</li>
+   * </ul>
+   *
+   * @example
+   * var editor = new Cropper({
+   *  size: { width: 128, height: 128 },
+   *  limit: 600,
+   *  canvas: document.querySelector('.js-editorcanvas'),
+   *  preview: document.querySelector('.js-previewcanvas')
+   * });
+   *
+   * @param {object} options - the parameters to be passed for instantiation
+   */
   constructor(options) {
     // Check the inputs
     if (!options.size) {
