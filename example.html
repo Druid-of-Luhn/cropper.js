@@ -5,20 +5,6 @@
     <meta charset="utf-8">
     <title>Image Uploader</title>
     <style>
-html,
-input {
-    box-sizing: border-box;
-    font-family: Helvetica, sans-serif;
-}
-
-* {
-    box-sizing: inherit;
-}
-
-.hidden {
-    display: none;
-}
-
 .img-export {
     display: block;
 }
@@ -30,7 +16,7 @@ input {
         <input type="file" class="js-fileinput img-upload" accept="image/jpeg,image/png,image/gif">
     </label>
     <button class="js-export img-export">Export</button>
-    <canvas class="js-editorcanvas hidden"></canvas>
+    <canvas class="js-editorcanvas"></canvas>
     <canvas class="js-previewcanvas"></canvas>
 
     <script src="cropper.js"></script>

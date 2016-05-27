@@ -112,8 +112,7 @@ class Cropper {
     // Create the cropping square
     this.crop = {
       size: options.size,
-      tl: { x: 0, y: 0 },
-      br: { x: options.size.width, y: options.size.height }
+      pos: { x: 0, y: 0 }
     };
     this.lastEvent = null;
     // Images larger than options.limit are resized
@@ -143,16 +142,6 @@ class Cropper {
   }
 
   /** @private */
-  readyEditor(e) {
-    this.imageCanvas.classList.remove('hidden');
-    this.render();
-    // Listen for clicks in the canvas
-    this.imageCanvas.onmousedown = this.clickStart.bind(this);
-    this.boundDrag = this.drag.bind(this);
-    this.boundClickStop = this.clickStop.bind(this);
-  }
-
-  /** @private */
   render() {
     this.c.clearRect(0, 0, this.imageCanvas.width, this.imageCanvas.height);
     this.displayImage();
@@ -161,17 +150,25 @@ class Cropper {
   }
 
   /** @private */
+  readyEditor(e) {
+    // Listen for clicks in the canvas
+    this.imageCanvas.onmousedown = this.clickStart.bind(this);
+    this.boundDrag = this.drag.bind(this);
+    this.boundClickStop = this.clickStop.bind(this);
+  }
+
+  /** @private */
   clickStart(e) {
-  // Get the crop handle to use
-  var position = { x: e.offsetX, y: e.offsetY };
-  this.lastEvent = {
-    position: position,
-    resizing: this.isResizing(position),
-    moving: this.isMoving(position)
-  };
-  // Listen for mouse movement and mouse release
-  this.imageCanvas.addEventListener('mousemove', this.boundDrag);
-  this.imageCanvas.addEventListener('mouseup', this.boundClickStop);
+    // Get the crop handle to use
+    var position = { x: e.offsetX, y: e.offsetY };
+    this.lastEvent = {
+      position: position,
+      resizing: this.isResizing(position),
+      moving: this.isMoving(position)
+    };
+    // Listen for mouse movement and mouse release
+    this.imageCanvas.addEventListener('mousemove', this.boundDrag);
+    this.imageCanvas.addEventListener('mouseup', this.boundClickStop);
   }
 
   /** @private */
@@ -182,9 +179,12 @@ class Cropper {
 
   /** @private */
   drag(e) {
-    var position = { x: e.offsetX, y: e.offsetY };
-    var dx = position.x - this.lastEvent.position.x;
-    var dy = position.y - this.lastEvent.position.y;
+    const position = {
+      x: e.offsetX,
+      y: e.offsetY
+    };
+    const dx = position.x - this.lastEvent.position.x;
+    const dy = position.y - this.lastEvent.position.y;
     // Determine whether we are resizing, moving, or nothing
     if (this.lastEvent.resizing) {
       this.resize(dx, dy);
@@ -198,28 +198,36 @@ class Cropper {
 
   /** @private */
   resize(dx, dy) {
-    var handle = this.crop.br;
+    let handle = {
+      x: this.crop.pos.x + this.crop.size.width,
+      y: this.crop.pos.y + this.crop.size.height
+    };
     // Maintain the aspect ratio
-    var amount = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    const amount = Math.abs(dx) > Math.abs(dy) ? dx : dy;
     if (this.inBounds(handle.x + amount, handle.y + amount)) {
-      handle.x += amount;
-      handle.y += amount;
+      this.crop.size.width += amount;
+      this.crop.size.height += amount;
     }
   }
 
   /** @private */
   move(dx, dy) {
-    var tl = this.crop.tl;
-    var br = this.crop.br;
-    // Make sure all four corners are in bounds
+    // Get the opposing coordinates
+    const tl = {
+      x: this.crop.pos.x,
+      y: this.crop.pos.y
+    };
+    const br = {
+      x: this.crop.pos.x + this.crop.size.width,
+      y: this.crop.pos.y + this.crop.size.height
+    };
+    // Make sure they are in bounds
     if (this.inBounds(tl.x + dx, tl.y + dy) &&
         this.inBounds(br.x + dx, tl.y + dy) &&
         this.inBounds(br.x + dx, br.y + dy) &&
         this.inBounds(tl.x + dx, br.y + dy)) {
-      tl.x += dx;
-      tl.y += dy;
-      br.x += dx;
-      br.y += dy;
+      this.crop.pos.x += dx;
+      this.crop.pos.y += dy;
     }
   }
 
@@ -241,36 +249,36 @@ class Cropper {
 
   /** @private */
   drawCropWindow() {
-    var tl = this.crop.tl;
-    var br = this.crop.br;
+    const pos = this.crop.pos;
+    const size = this.crop.size;
     this.c.strokeStyle = 'red';
     this.c.fillStyle = 'red';
     // Draw the crop window outline
-    this.c.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+    this.c.strokeRect(pos.x, pos.y, size.width, size.height);
     // Draw the draggable handle
     var path = new Path2D();
-    path.arc(br.x, br.y, 3, 0, Math.PI * 2, true);
+    path.arc(pos.x + size.width, pos.y + size.height, 3, 0, Math.PI * 2, true);
     this.c.fill(path);
   }
 
   /** @private */
   preview() {
-    var tl = this.crop.tl;
-    var br = this.crop.br;
-    var imageData = this.c.getImageData(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+    const pos = this.crop.pos;
+    const size = this.crop.size;
+    var imageData = this.c.getImageData(pos.x, pos.y, size.width, size.height);
     if (imageData === null) {
       return false;
     }
     var ctx = this.previewCanvas.getContext('2d');
-    this.previewCanvas.width = this.crop.size.width;
-    this.previewCanvas.height = this.crop.size.height;
+    this.previewCanvas.width = size.width;
+    this.previewCanvas.height = size.height;
     ctx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
     // Draw the image to the preview canvas, resizing it to fit
     ctx.drawImage(this.imageCanvas,
         // Top left corner coordinates of image
-        tl.x, tl.y,
+        pos.x, pos.y,
         // Width and height of image
-        br.x - tl.x, br.y - tl.y,
+        size.width, size.height,
         // Top left corner coordinates of result in canvas
         0, 0,
         // Width and height of result in canvas
@@ -278,18 +286,22 @@ class Cropper {
   }
 
   /** @private */
-  isResizing(pos) {
+  isResizing(coord) {
     var errorOffset = 10;
-    var handle = this.crop.br;
-    return !(pos.x < handle.x - errorOffset || pos.x > handle.x + errorOffset ||
-        pos.y < handle.y - errorOffset || pos.y > handle.y + errorOffset);
+    var handle = {
+      x: this.crop.pos.x + this.crop.size.width,
+      y: this.crop.pos.y + this.crop.size.height
+    };
+    return !(coord.x < handle.x - errorOffset || coord.x > handle.x + errorOffset
+          || coord.y < handle.y - errorOffset || coord.y > handle.y + errorOffset);
   }
 
   /** @private */
-  isMoving(pos) {
-    var tl = this.crop.tl;
-    var br = this.crop.br;
-    return !(pos.x < tl.x || pos.x > br.x || pos.y < tl.y || pos.y > br.y);
+  isMoving(coord) {
+    const pos = this.crop.pos;
+    const size = this.crop.size;
+    return !(coord.x < pos.x || coord.x > pos.x + size.width
+          || coord.y < pos.y || coord.y > pos.y + size.height);
   }
 
   /** @private */
