@@ -23,7 +23,7 @@ class Uploader {
  *  types: [ 'gif', 'jpg', 'jpeg', 'png' ]
  * });
  * *
- * @param {object} options - the parameters to be passed for instantiation
+ * @param {object} options the parameters to be passed for instantiation
  */
   constructor(options) {
     if (!options.input) {
@@ -34,6 +34,10 @@ class Uploader {
     this.reader = new FileReader();
   }
 
+  /**
+   * Listen for an image file to be uploaded, then validate it and resolve with the image data.
+   * @return {Promise} Resolves to the image data.
+   */
   listen() {
     return new Promise((resolve, reject) => {
       this.fileInput.onchange = (e) => {
@@ -49,6 +53,7 @@ class Uploader {
     });
   }
 
+  /** @private */
   fileReaderSetup(file, resolve) {
     if (this.validFileType(file.type)) {
       // Read the image as base64 data
@@ -60,6 +65,7 @@ class Uploader {
     }
   }
 
+  /** @private */
   validFileType(filename) {
     // Get the second part of the MIME type
     let extension = filename.split('/').pop().toLowerCase();
@@ -88,7 +94,7 @@ class Cropper {
    *  preview: document.querySelector('.js-previewcanvas')
    * });
    *
-   * @param {object} options - the parameters to be passed for instantiation
+   * @param {object} options the parameters to be passed for instantiation
    */
   constructor(options) {
     // Check the inputs
@@ -116,6 +122,11 @@ class Cropper {
     this.limit = options.limit || 600; // default to 600px
   }
 
+  /**
+   * Set the source image data for the cropper.
+   *
+   * @param {String} source the source of the image to crop.
+   */
   setImageSource(source) {
     this.image = new Image();
     this.image.src = source;
@@ -124,6 +135,11 @@ class Cropper {
     this.render();
   }
 
+  /**
+   * Export the result to a given image tag.
+   *
+   * @param {HTMLElement} img the image tag to export the result to.
+   */
   export(img) {
     img.setAttribute('src', this.previewCanvas.toDataURL());
   }
