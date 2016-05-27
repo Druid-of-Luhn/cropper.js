@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docs": "jsdoc cropper.js -d docs"
   },
   "repository": {
     "type": "git",
@@ -26,4 +26,7 @@
     "url": "https://github.com/Druid-of-Luhn/cropper.js/issues"
   },
   "homepage": "https://github.com/Druid-of-Luhn/cropper.js#readme",
+  "devDependencies": {
+    "jsdoc": "^3.4.0"
+  }
 }
