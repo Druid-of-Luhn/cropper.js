@@ -3,7 +3,7 @@
  * of images.
  * @author Billy Brown
  * @license MIT
- * @version 2.0.1
+ * @version 2.0.2
  */
 
 /** Class used for uploading images. */
@@ -121,6 +121,11 @@ class Cropper {
       handleSize: 10
     };
     this.lastEvent = null;
+
+    // Set the preview canvas size
+    this.previewCanvas.width = options.size.width;
+    this.previewCanvas.height = options.size.height;
+
     // Bind the methods, ready to be added and removed as events
     this.boundDrag = this.drag.bind(this);
     this.boundClickStop = this.clickStop.bind(this);
@@ -295,8 +300,6 @@ class Cropper {
     }
     // Prepare and clear the preview canvas
     var ctx = this.previewCanvas.getContext('2d');
-    this.previewCanvas.width = size.x;
-    this.previewCanvas.height = size.y;
     ctx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
     // Draw the image to the preview canvas, resizing it to fit
     ctx.drawImage(this.imageCanvas,
