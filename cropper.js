@@ -3,7 +3,7 @@
  * of images.
  * @author Billy Brown
  * @license MIT
- * @version 2.0.0
+ * @version 2.0.1
  */
 
 /** Class used for uploading images. */
@@ -72,6 +72,13 @@ class Uploader {
   }
 }
 
+function squareContains(square, coordinate) {
+  return coordinate.x >= square.pos.x
+    && coordinate.x <= square.pos.x + square.size.x
+    && coordinate.y >= square.pos.y
+    && coordinate.y <= square.pos.y + square.size.y;
+}
+
 /** Class for cropping an image. */
 class Cropper {
   /**
@@ -96,27 +103,27 @@ class Cropper {
    */
   constructor(options) {
     // Check the inputs
-    if (!options.size) {
-      throw 'Size field in options is required';
-    }
-    if (!options.canvas) {
-      throw 'Could not find image canvas element.';
-    }
-    if (!options.preview) {
-      throw 'Could not find preview canvas element.';
-    }
+    if (!options.size) { throw 'Size field in options is required'; }
+    if (!options.canvas) { throw 'Could not find image canvas element.'; }
+    if (!options.preview) { throw 'Could not find preview canvas element.'; }
+
     // Hold on to the values
     this.imageCanvas = options.canvas;
     this.previewCanvas = options.preview;
     this.c = this.imageCanvas.getContext("2d");
-    // Create the cropping square
-    this.crop = {
-      size: options.size,
-      pos: { x: 0, y: 0 }
-    };
-    this.lastEvent = null;
+    
     // Images larger than options.limit are resized
     this.limit = options.limit || 600; // default to 600px
+    // Create the cropping square with the handle's size
+    this.crop = {
+      size: { x: options.size.width, y: options.size.height },
+      pos: { x: 0, y: 0 },
+      handleSize: 10
+    };
+    this.lastEvent = null;
+    // Bind the methods, ready to be added and removed as events
+    this.boundDrag = this.drag.bind(this);
+    this.boundClickStop = this.clickStop.bind(this);
   }
 
   /**
@@ -127,9 +134,12 @@ class Cropper {
   setImageSource(source) {
     this.image = new Image();
     this.image.src = source;
-    this.image.onload = this.readyEditor.bind(this);
-    // Perform an initial render
-    this.render();
+    this.image.onload = (e) => {
+      // Perform an initial render
+      this.render();
+      // Listen for events on the canvas when the image is ready
+      this.imageCanvas.onmousedown = this.clickStart.bind(this);
+    }
   }
 
   /**
@@ -150,16 +160,8 @@ class Cropper {
   }
 
   /** @private */
-  readyEditor(e) {
-    // Listen for clicks in the canvas
-    this.imageCanvas.onmousedown = this.clickStart.bind(this);
-    this.boundDrag = this.drag.bind(this);
-    this.boundClickStop = this.clickStop.bind(this);
-  }
-
-  /** @private */
   clickStart(e) {
-    // Get the crop handle to use
+    // Get the click position and hold onto it for the expected mousemove
     var position = { x: e.offsetX, y: e.offsetY };
     this.lastEvent = {
       position: position,
@@ -173,8 +175,27 @@ class Cropper {
 
   /** @private */
   clickStop(e) {
+    // Stop listening for mouse movement and mouse release
     this.imageCanvas.removeEventListener("mousemove", this.boundDrag);
     this.imageCanvas.removeEventListener("mouseup", this.boundClickStop);
+  }
+
+  /** @private */
+  isResizing(coord) {
+    const size = this.crop.handleSize;
+    const handle = {
+      pos: {
+        x: this.crop.pos.x + this.crop.size.x - size / 2,
+        y: this.crop.pos.y + this.crop.size.y - size / 2
+      },
+      size: { x: size, y: size }
+    };
+    return squareContains(handle, coord);
+  }
+
+  /** @private */
+  isMoving(coord) {
+    return squareContains(this.crop, coord);
   }
 
   /** @private */
@@ -199,14 +220,14 @@ class Cropper {
   /** @private */
   resize(dx, dy) {
     let handle = {
-      x: this.crop.pos.x + this.crop.size.width,
-      y: this.crop.pos.y + this.crop.size.height
+      x: this.crop.pos.x + this.crop.size.x,
+      y: this.crop.pos.y + this.crop.size.y
     };
     // Maintain the aspect ratio
     const amount = Math.abs(dx) > Math.abs(dy) ? dx : dy;
     if (this.inBounds(handle.x + amount, handle.y + amount)) {
-      this.crop.size.width += amount;
-      this.crop.size.height += amount;
+      this.crop.size.x += amount;
+      this.crop.size.y += amount;
     }
   }
 
@@ -218,8 +239,8 @@ class Cropper {
       y: this.crop.pos.y
     };
     const br = {
-      x: this.crop.pos.x + this.crop.size.width,
-      y: this.crop.pos.y + this.crop.size.height
+      x: this.crop.pos.x + this.crop.size.x,
+      y: this.crop.pos.y + this.crop.size.y
     };
     // Make sure they are in bounds
     if (this.inBounds(tl.x + dx, tl.y + dy) &&
@@ -237,11 +258,12 @@ class Cropper {
     if (this.image.width > this.limit) {
       this.image.height *= this.limit / this.image.width;
       this.image.width = this.limit;
-    } else if (this.image.height > this.limit) {
+    }
+    if (this.image.height > this.limit) {
       this.image.width *= this.limit / this.image.height;
       this.image.height = this.limit;
     }
-    // Fit the image to the canvas (fixed width canvas, dynamic height)
+    // Fit the image to the canvas
     this.imageCanvas.width = this.image.width;
     this.imageCanvas.height = this.image.height;
     this.c.drawImage(this.image, 0, 0, this.image.width, this.image.height);
@@ -251,13 +273,14 @@ class Cropper {
   drawCropWindow() {
     const pos = this.crop.pos;
     const size = this.crop.size;
+    const radius = this.crop.handleSize / 2;
     this.c.strokeStyle = 'red';
     this.c.fillStyle = 'red';
     // Draw the crop window outline
-    this.c.strokeRect(pos.x, pos.y, size.width, size.height);
+    this.c.strokeRect(pos.x, pos.y, size.x, size.y);
     // Draw the draggable handle
     var path = new Path2D();
-    path.arc(pos.x + size.width, pos.y + size.height, 3, 0, Math.PI * 2, true);
+    path.arc(pos.x + size.x, pos.y + size.y, radius, 0, Math.PI * 2, true);
     this.c.fill(path);
   }
 
@@ -265,20 +288,22 @@ class Cropper {
   preview() {
     const pos = this.crop.pos;
     const size = this.crop.size;
-    var imageData = this.c.getImageData(pos.x, pos.y, size.width, size.height);
+    // Fetch the image data from the canvas
+    var imageData = this.c.getImageData(pos.x, pos.y, size.x, size.y);
     if (imageData === null) {
       return false;
     }
+    // Prepare and clear the preview canvas
     var ctx = this.previewCanvas.getContext('2d');
-    this.previewCanvas.width = size.width;
-    this.previewCanvas.height = size.height;
+    this.previewCanvas.width = size.x;
+    this.previewCanvas.height = size.y;
     ctx.clearRect(0, 0, this.previewCanvas.width, this.previewCanvas.height);
     // Draw the image to the preview canvas, resizing it to fit
     ctx.drawImage(this.imageCanvas,
         // Top left corner coordinates of image
         pos.x, pos.y,
         // Width and height of image
-        size.width, size.height,
+        size.x, size.y,
         // Top left corner coordinates of result in canvas
         0, 0,
         // Width and height of result in canvas
@@ -286,27 +311,13 @@ class Cropper {
   }
 
   /** @private */
-  isResizing(coord) {
-    var errorOffset = 10;
-    var handle = {
-      x: this.crop.pos.x + this.crop.size.width,
-      y: this.crop.pos.y + this.crop.size.height
-    };
-    return !(coord.x < handle.x - errorOffset || coord.x > handle.x + errorOffset
-          || coord.y < handle.y - errorOffset || coord.y > handle.y + errorOffset);
-  }
-
-  /** @private */
-  isMoving(coord) {
-    const pos = this.crop.pos;
-    const size = this.crop.size;
-    return !(coord.x < pos.x || coord.x > pos.x + size.width
-          || coord.y < pos.y || coord.y > pos.y + size.height);
-  }
-
-  /** @private */
   inBounds(x, y) {
-    return x >= 0 && x <= this.imageCanvas.width &&
-           y >= 0 && y <= this.imageCanvas.height;
+    return squareContains({
+      pos: { x: 0, y: 0 },
+      size: {
+        x: this.imageCanvas.width,
+        y: this.imageCanvas.height
+      }
+    }, { x: x, y: y });
   }
 }
