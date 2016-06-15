@@ -43,9 +43,7 @@ try {
     // Make sure both were initialised correctly
     if (uploader && editor) {
         // Start the uploader, which will launch the editor
-        uploader.listen()
-            .then(editor.setImageSource.bind(editor))
-            .catch((error) => { throw error; });
+        uploader.listen(editor.setImageSource.bind(editor), (error) => { throw error; });
     }
     // Allow the result to be exported as an actual image
     var img = document.createElement('img');

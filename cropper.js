@@ -3,7 +3,7 @@
  * of images.
  * @author Billy Brown
  * @license MIT
- * @version 2.0.3
+ * @version 2.1.0
  */
 
 /** Class used for uploading images. */
@@ -31,36 +31,33 @@ class Uploader {
     }
     this.fileInput = options.input;
     this.types = options.types || [ 'gif', 'jpg', 'jpeg', 'png' ];
-    this.reader = new FileReader();
   }
 
   /**
    * Listen for an image file to be uploaded, then validate it and resolve with the image data.
-   * @return {Promise} Resolves to the image data.
    */
-  listen() {
-    return new Promise((resolve, reject) => {
-      this.fileInput.onchange = (e) => {
-        // Do not submit the form
-        e.preventDefault();
+  listen(resolve, reject) {
+    this.fileInput.onchange = (e) => {
+      // Do not submit the form
+      e.preventDefault();
 
-        // Make sure one file was selected
-        if (!this.fileInput.files || this.fileInput.files.length !== 1) {
-          reject('[Uploader:listen] Select only one file.');
-        }
+      // Make sure one file was selected
+      if (!this.fileInput.files || this.fileInput.files.length !== 1) {
+        reject('[Uploader:listen] Select only one file.');
+      }
 
-        let file = this.fileInput.files[0];
-        // Make sure the file is of the correct type
-        if (!this.validFileType(file.type)) {
-          reject(`[Uploader:listen] Invalid file type: ${file.type}`);
-        } else {
-          // Read the image as base64 data
-          this.reader.readAsDataURL(file);
-          // When loaded, return the file data
-          this.reader.onload = (e) => resolve(e.target.result);
-        }
-      };
-    });
+      let file = this.fileInput.files[0];
+      let reader = new FileReader();
+      // Make sure the file is of the correct type
+      if (!this.validFileType(file.type)) {
+        reject(`[Uploader:listen] Invalid file type: ${file.type}`);
+      } else {
+        // Read the image as base64 data
+        reader.readAsDataURL(file);
+        // When loaded, return the file data
+        reader.onload = (e) => resolve(e.target.result);
+      }
+    };
   }
 
   /** @private */
