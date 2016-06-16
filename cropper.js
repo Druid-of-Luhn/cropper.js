@@ -86,14 +86,29 @@ class Cropper {
    *  <li>limit {integer}: the longest side that the cropping area will be limited to, resizing any larger images.</li>
    *  <li>canvas {HTMLElement} (required): the cropping canvas element. Instantiation fails if not provided.</li>
    *  <li>preview {HTMLElement} (required): the preview canvas element. Instantiation fails if not provided.</li>
+   *  <li>drawCrop {function} (optional): a function for drawing the cropping area given the canvas context and crop object.</li>
    * </ul>
+   *
+   * <code>drawCrop</code> has the following prototype: <code>drawCrop({canvas context}, {crop object})</code>.
+   *
+   * The <code>crop</code> object has the form:
+   * <pre><code>
+   * crop = {
+   *   size: { x: Number, y: Number },
+   *   pos: { x: Number, y: Number },
+   *   handleSize: Number
+   * }
+   * </pre><code>
    *
    * @example
    * var editor = new Cropper({
    *  size: { width: 128, height: 128 },
    *  limit: 600,
    *  canvas: document.querySelector('.js-editorcanvas'),
-   *  preview: document.querySelector('.js-previewcanvas')
+   *  preview: document.querySelector('.js-previewcanvas'),
+   *  drawCrop: (context, crop) => {
+   *    // Draw code here
+   *  }
    * });
    *
    * @param {object} options the parameters to be passed for instantiation
@@ -130,7 +145,7 @@ class Cropper {
   }
 
   /**
-   * Set the source image data for the cropper.
+   * Set the source image data for the cropper and get it running.
    *
    * @param {String} source the source of the image to crop.
    */
