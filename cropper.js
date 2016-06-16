@@ -100,9 +100,9 @@ class Cropper {
    */
   constructor(options) {
     // Check the inputs
-    if (!options.size) { throw 'Size field in options is required'; }
-    if (!options.canvas) { throw 'Could not find image canvas element.'; }
-    if (!options.preview) { throw 'Could not find preview canvas element.'; }
+    if (!options.size) { throw 'Size field in options is required.'; }
+    if (!options.canvas) { throw 'Image canvas element in options is required.'; }
+    if (!options.preview) { throw 'Preview canvas element in options is required'; }
 
     // Hold on to the values
     this.imageCanvas = options.canvas;
@@ -117,6 +117,8 @@ class Cropper {
       pos: { x: 0, y: 0 },
       handleSize: 10
     };
+    // Set the crop area draw function
+    this.drawCropWindow = options.drawCrop || this.defaultDrawCropWindow;
 
     // Set the preview canvas size
     this.previewCanvas.width = options.size.width;
@@ -157,7 +159,7 @@ class Cropper {
     this.c.clearRect(0, 0, this.imageCanvas.width, this.imageCanvas.height);
     this.displayImage();
     this.preview();
-    this.drawCropWindow();
+    this.drawCropWindow(this.c, this.crop);
   }
 
   /** @private */
@@ -268,18 +270,18 @@ class Cropper {
   }
 
   /** @private */
-  drawCropWindow() {
-    const pos = this.crop.pos;
-    const size = this.crop.size;
-    const radius = this.crop.handleSize / 2;
-    this.c.strokeStyle = 'red';
-    this.c.fillStyle = 'red';
+  defaultDrawCropWindow(context, crop) {
+    const pos = crop.pos;
+    const size = crop.size;
+    const radius = crop.handleSize / 2;
+    context.strokeStyle = 'red';
+    context.fillStyle = 'red';
     // Draw the crop window outline
-    this.c.strokeRect(pos.x, pos.y, size.x, size.y);
+    context.strokeRect(pos.x, pos.y, size.x, size.y);
     // Draw the draggable handle
     const path = new Path2D();
     path.arc(pos.x + size.x, pos.y + size.y, radius, 0, Math.PI * 2, true);
-    this.c.fill(path);
+    context.fill(path);
   }
 
   /** @private */
