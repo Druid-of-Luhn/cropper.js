@@ -13,12 +13,12 @@ The library is written in ECMAScript 6, so make sure that target browsers suppor
 
 ## Documentation
 
-The [documentation](http://billy-brown.net/cropper.js/docs) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need.
+The [documentation](https://www.billy-brown.net/cropper-docs/) has examples on how to use the `Uploader` and `Cropper` classes provided, as well as a description of the few functions they need.
 An example webpage can be seen here: [https://www.billy-brown.net/cropper.js/](https://www.billy-brown.net/cropper.js/)
 
 ## Examples
 
-You can experiment with the code over on Codepen here: [https://codepen.io/_Billy_Brown/pen/zvzWym?editors=101](http://codepen.io/_Billy_Brown/pen/zvzWym?editors=101)
+You can experiment with the code [over on Codepen](http://codepen.io/_Billy_Brown/pen/zvzWym?editors=101).
 
 The `example.html` page contains a basic image cropper.
 
